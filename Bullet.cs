@@ -12,19 +12,35 @@ namespace _2DSG
     {
         public PictureBox Sprite { get; set; }
         public int Speed { get; set; } = 10;
+        private static DateTime lastFireTime = DateTime.MinValue;
+        private static int fireDelayMs = 200;
+        public Player Owner { get; set; }
+        public int Direction { get; set; } = 1; 
 
-        public Bullet(int x, int y)
+        public Bullet(int left, int top, int dir, Player owner)
         {
             Sprite = new PictureBox();
             Sprite.Size = new Size(10, 5);
-            Sprite.BackColor = Color.Red;
-            Sprite.Left = x;
-            Sprite.Top = y;
+            Owner = owner;
+            Sprite.BackColor = Owner.Sprite.BackColor;
+            Sprite.Left = left;
+            Sprite.Top = top;
+            Direction = dir;
         }
 
         public void Move()
         {
-            Sprite.Left += Speed;
+            Sprite.Left += Speed * Direction;
+        }
+
+        public static bool CanFire()
+        {
+            return (DateTime.Now - lastFireTime).TotalMilliseconds >= fireDelayMs;
+        }
+
+        public static void RegisterFire()
+        {
+            lastFireTime = DateTime.Now;
         }
     }
 }

@@ -15,18 +15,30 @@ namespace _2DSG
         public int JumpSpeed { get; set; } = 0;
         public bool Jumping { get; set; } = false;
         public int Force { get; set; } = 8;
+        public Health Health { get; private set; }
+        public bool FacingRight { get; set; } = true;
 
-        public Player(int x, int y)
+        public Player(int x, int y, int maxHealth, string spriteColor)
         {
             Sprite = new PictureBox();
             Sprite.Size = new Size(40, 60);
-            Sprite.BackColor = Color.Blue;
+            Sprite.BackColor = Color.FromName(spriteColor);
             Sprite.Left = x;
             Sprite.Top = y;
+            Health = new Health(maxHealth);
         }
 
-        public void MoveLeft() => Sprite.Left -= Speed;
-        public void MoveRight() => Sprite.Left += Speed;
+        public void MoveLeft()
+        {
+            Sprite.Left -= Speed;
+            FacingRight = false;
+        }
+
+        public void MoveRight()
+        {
+            Sprite.Left += Speed;
+            FacingRight = true;
+        }
 
         public void ApplyGravity()
         {

@@ -16,7 +16,7 @@ namespace _2DSG
         {
             Sprite = new PictureBox();
             Sprite.Size = new Size(width, height);
-            Sprite.BackColor = Color.Brown;
+            Sprite.BackColor = Color.Gray;
             Sprite.Left = x;
             Sprite.Top = y;
         }
