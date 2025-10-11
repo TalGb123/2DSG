@@ -2,61 +2,68 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 
 namespace _2DSG
 {
-    public partial class Form1 : Form
+    public partial class GameForm : Form
     {
         List<Player> players = new List<Player>();
         List<Bullet> bullets = new List<Bullet>();
         List<Platform> platforms = new List<Platform>();
         Timer gameTimer = new Timer();
-        private const string MapFilePath = "Assets/Data/Maps.txt";
 
-        // Movement flags for each player (expandable)
         List<bool> pLeft = new List<bool>();
         List<bool> pRight = new List<bool>();
         List<bool> pJump = new List<bool>();
         List<bool> pFire = new List<bool>();
+        GameSettings gameSettings;
 
-        public Form1()
+        public GameForm(GameSettings gameSettings)
         {
             InitializeComponent();
-
-            // Set fixed large window size
+            this.Name = "2D Shooter Game";
             this.ClientSize = new Size(1280, 720);
 
-            // Load all maps from the text file
-            List<Map> allMaps = Map.LoadAll(MapFilePath);
+            this.gameSettings = gameSettings;
 
-            // Select a map (e.g., the first one)
-            Map selectedMap = allMaps[0]; // You can add a selector UI later
-
-            // Create players and movement flags
             int w = this.ClientSize.Width;
             int h = this.ClientSize.Height;
-            string[] playerColors = { "Red", "Blue", "Green", "Yellow" }; // Colors for players
+            string[] playerColors = { "Red", "Blue", "Green", "Yellow" }; 
             int i = 0;
-            foreach (var start in selectedMap.PlayerStarts)
+            foreach (var start in this.gameSettings.SelectedMap.PlayerStarts)
             {
                 int px = (int)(start.X * w);
                 int py = (int)(start.Y * h);
-                var player = new Player(px, py, 100, playerColors[i]); // Default health/color for now
+                var player = new Player(px, py, 100, playerColors[i], "player");
+                // lazy solution for player colors as there are only 2 atm, in final project i will make it more dynamic
+                if (i == 0)
+                {
+                    player.Sprite.BackColor = this.gameSettings.PlayerColor1;
+                    player.NameTag.Text = this.gameSettings.PlayerName1;
+                }
+                else
+                {
+                    player.Sprite.BackColor = this.gameSettings.PlayerColor2;
+                    player.NameTag.Text = this.gameSettings.PlayerName2;
+                }
+                player.NameTag.AutoSize = true;
                 players.Add(player);
                 this.Controls.Add(player.Sprite);
                 this.Controls.Add(player.Health.Sprite);
+                this.Controls.Add(player.NameTag);
+                
                 i++;
-
-                // Initialize movement flags for each player
                 pLeft.Add(false);
                 pRight.Add(false);
                 pJump.Add(false);
                 pFire.Add(false);
             }
 
-            // Create platforms from the selected map
-            platforms = selectedMap.CreatePlatforms(this.ClientSize.Width, this.ClientSize.Height);
+
+
+            platforms = gameSettings.SelectedMap.CreatePlatforms(this.ClientSize.Width, this.ClientSize.Height);
             foreach (var platform in platforms)
             {
                 this.Controls.Add(platform.Sprite);
@@ -69,7 +76,6 @@ namespace _2DSG
             //    this.BackgroundImageLayout = ImageLayout.Stretch;
             //}
 
-            // setup game loop
             gameTimer.Interval = 20;
             gameTimer.Tick += GameLoop;
             gameTimer.Start();
@@ -80,7 +86,6 @@ namespace _2DSG
 
         private void GameLoop(object sender, EventArgs e)
         {
-            // Player movement
             for (int i = 0; i < players.Count; i++)
             {
                 if (pLeft[i]) players[i].MoveLeft();
@@ -92,18 +97,15 @@ namespace _2DSG
                 }
             }
 
-            // Physics
             foreach (var player in players)
                 player.ApplyGravity();
 
-            // Bullets
             foreach (var b in bullets)
                 b.Move();
 
-            // Shooting (same keys for all players, can be expanded)
             for (int i = 0; i < players.Count; i++)
             {
-                if (pFire[i] && Bullet.CanFire())
+                if (pFire[i] && players[i].CanFire())
                 {
                     int direction = players[i].FacingRight ? 1 : -1;
                     var bullet = new Bullet(
@@ -114,21 +116,18 @@ namespace _2DSG
                     );
                     bullets.Add(bullet);
                     this.Controls.Add(bullet.Sprite);
-                    Bullet.RegisterFire();
+                    players[i].RegisterFire(); 
                 }
             }
 
-            // Collisions
             foreach (var player in players)
                 CheckCollisions(player);
 
             CheckBulletPlayerCollisions();
 
-            // Health bar settings
             int healthBarWidth = 60;
             int healthBarHeight = 8;
 
-            // Update health bar positions and colors
             foreach (var player in players)
             {
                 player.Health.Sprite.Width = (int)(healthBarWidth * (double)player.Health.Current / player.Health.Max);
@@ -136,28 +135,33 @@ namespace _2DSG
                 player.Health.Sprite.Left = player.Sprite.Left + (player.Sprite.Width - healthBarWidth) / 2;
                 player.Health.Sprite.Top = player.Sprite.Top - healthBarHeight - 5;
                 player.Health.Sprite.BackColor = player.Health.Current > 0 ? Color.Green : Color.Red;
+
+                player.NameTag.Left = player.Sprite.Left + (player.Sprite.Width - player.NameTag.Width) / 2;
+                player.NameTag.Top = player.Health.Sprite.Top - player.NameTag.Height - 5;
             }
 
-            // Game Over
             GameOver();
         }
 
         private void KeyIsDown(object sender, KeyEventArgs e)
         {
-            // For now, same keys for all players
             if (e.KeyCode == Keys.A) pLeft[0] = true;
             if (e.KeyCode == Keys.D) pRight[0] = true;
             if (e.KeyCode == Keys.W) pJump[0] = true;
             if (e.KeyCode == Keys.X) pFire[0] = true;
+            if (e.KeyCode == Keys.Escape) Application.Exit();
+            if (e.KeyCode == Keys.P)
+            {
+                PauseForm pauseForm = new PauseForm(this.gameSettings, this, "Game Paused");
+                pauseForm.ShowDialog();
+            }
 
             if (players.Count > 1)
             {
                 if (e.KeyCode == Keys.Left) pLeft[1] = true;
                 if (e.KeyCode == Keys.Right) pRight[1] = true;
                 if (e.KeyCode == Keys.Up) pJump[1] = true;
-                if (e.KeyCode == Keys.LButton) pFire[1] = true;
             }
-            // Add more controls for more players as needed
         }
 
         private void KeyIsUp(object sender, KeyEventArgs e)
@@ -172,20 +176,16 @@ namespace _2DSG
                 if (e.KeyCode == Keys.Left) pLeft[1] = false;
                 if (e.KeyCode == Keys.Right) pRight[1] = false;
                 if (e.KeyCode == Keys.Up) pJump[1] = false;
-                if (e.KeyCode == Keys.LButton) pFire[1] = false;
             }
-            // Add more controls for more players as needed
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            // Example: left mouse button fires for player 2 (index 1)
             if (e.Button == MouseButtons.Left && players.Count > 1)
             {
                 pFire[1] = true;
             }
-            // Add more logic for additional players if needed
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -195,7 +195,6 @@ namespace _2DSG
             {
                 pFire[1] = false;
             }
-            // Add more logic for additional players if needed
         }
 
         private void CheckCollisions(Player player)
@@ -207,23 +206,19 @@ namespace _2DSG
                 Rectangle playerRect = player.Sprite.Bounds;
                 Rectangle platRect = platform.Sprite.Bounds;
 
-                // Only check for landing if the player is falling
                 bool isFalling = player.JumpSpeed >= 0;
 
-                // Calculate where the player would be after this frame
                 int nextBottom = playerRect.Bottom + player.JumpSpeed;
 
-                // Check if player is above the platform and will cross its top boundary
                 bool willLandOnTop =
                     isFalling &&
-                    playerRect.Bottom <= platRect.Top && // Was above the platform
-                    nextBottom >= platRect.Top &&        // Will cross the top
-                    playerRect.Right > platRect.Left + 5 && // Not too far left
-                    playerRect.Left < platRect.Right - 5;   // Not too far right
+                    playerRect.Bottom <= platRect.Top && 
+                    nextBottom >= platRect.Top &&        
+                    playerRect.Right > platRect.Left + 5 && 
+                    playerRect.Left < platRect.Right - 5; 
 
                 if (willLandOnTop)
                 {
-                    // Land on platform
                     player.Jumping = false;
                     player.JumpSpeed = 0;
                     player.Sprite.Top = platRect.Top - player.Sprite.Height;
@@ -244,7 +239,6 @@ namespace _2DSG
             {
                 var b = bullets[i];
 
-                // Check collision with each player
                 for (int p = 0; p < players.Count; p++)
                 {
                     if (b.Owner != players[p] && b.Sprite.Bounds.IntersectsWith(players[p].Sprite.Bounds))
@@ -272,7 +266,9 @@ namespace _2DSG
                 if (player.Sprite.Top > this.ClientSize.Height)
                 {
                     gameTimer.Stop();
-                    MessageBox.Show("Game Over! A player fell off the map.");
+                    string message = $"Game Over!" + $"\n{player.NameTag.Text} fell from the map!";
+                    PauseForm gameOverForm = new PauseForm(this.gameSettings, this, message);
+                    gameOverForm.ShowDialog();
                     return;
                 }
             }
@@ -282,10 +278,11 @@ namespace _2DSG
                 string message = aliveCount == 1 ? "We have a winner!" : "It's a draw!";
                 if (lastAlive != null)
                 {
-                    message += $"\nWinner is the {lastAlive.Sprite.BackColor.Name} player!";
+                    message += $"\nWinner is the {lastAlive.Sprite.Name}!";
                 }
-                MessageBox.Show(message, "Game Over");
-                this.Close(); // Close the game window
+                PauseForm gameOverForm = new PauseForm(this.gameSettings, this, message);
+                gameOverForm.ShowDialog();
+                return;
             }
         }
     }

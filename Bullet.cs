@@ -12,8 +12,6 @@ namespace _2DSG
     {
         public PictureBox Sprite { get; set; }
         public int Speed { get; set; } = 10;
-        private static DateTime lastFireTime = DateTime.MinValue;
-        private static int fireDelayMs = 200;
         public Player Owner { get; set; }
         public int Direction { get; set; } = 1; 
 
@@ -31,16 +29,6 @@ namespace _2DSG
         public void Move()
         {
             Sprite.Left += Speed * Direction;
-        }
-
-        public static bool CanFire()
-        {
-            return (DateTime.Now - lastFireTime).TotalMilliseconds >= fireDelayMs;
-        }
-
-        public static void RegisterFire()
-        {
-            lastFireTime = DateTime.Now;
         }
     }
 }
