@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace _2DSG
 {
-    internal class Platform
+    public class Platform
     {
         public PictureBox Sprite { get; set; }
 

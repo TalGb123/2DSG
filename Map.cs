@@ -4,7 +4,7 @@ using System.IO;
 
 namespace _2DSG
 {
-    internal class Map
+    public class Map
     {
         public string Name { get; set; }
         public string BackgroundImage { get; set; }

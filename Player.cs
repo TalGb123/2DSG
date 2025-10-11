@@ -17,6 +17,8 @@ namespace _2DSG
         public int Force { get; set; } = 8;
         public Health Health { get; private set; }
         public bool FacingRight { get; set; } = true;
+        public DateTime LastFireTime { get; set; } = DateTime.MinValue;
+        public int FireDelayMs { get; set; } = 200;
 
         public Player(int x, int y, int maxHealth, string spriteColor)
         {
@@ -44,6 +46,16 @@ namespace _2DSG
         {
             Sprite.Top += JumpSpeed;
             if (Jumping) JumpSpeed += 1; 
+        }
+
+        public bool CanFire()
+        {
+            return (DateTime.Now - LastFireTime).TotalMilliseconds >= FireDelayMs;
+        }
+
+        public void RegisterFire()
+        {
+            LastFireTime = DateTime.Now;
         }
     }
 }

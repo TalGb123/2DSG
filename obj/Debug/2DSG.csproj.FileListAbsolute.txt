@@ -20,3 +20,16 @@ C:\Users\leona\שולחן העבודה\2DSG\2DSG\obj\Debug\2DSG.pdb
 C:\Users\leona\שולחן העבודה\2DSG\2DSG\obj\Debug\2DSG.exe.config
 C:\Users\leona\שולחן העבודה\2DSG\2DSG\bin\Debug\Assets\Data\Maps.txt
 C:\Users\leona\שולחן העבודה\2DSG\2DSG\bin\Debug\Assets\MapBG\Halo.png
+C:\Users\User\Desktop\2DSG\bin\Debug\Assets\Data\Maps.txt
+C:\Users\User\Desktop\2DSG\bin\Debug\Assets\MapBG\Halo.png
+C:\Users\User\Desktop\2DSG\bin\Debug\2DSG.exe.config
+C:\Users\User\Desktop\2DSG\bin\Debug\2DSG.exe
+C:\Users\User\Desktop\2DSG\bin\Debug\2DSG.pdb
+C:\Users\User\Desktop\2DSG\obj\Debug\2DSG.csproj.AssemblyReference.cache
+C:\Users\User\Desktop\2DSG\obj\Debug\_2DSG.Properties.Resources.resources
+C:\Users\User\Desktop\2DSG\obj\Debug\2DSG.csproj.GenerateResource.cache
+C:\Users\User\Desktop\2DSG\obj\Debug\2DSG.csproj.CoreCompileInputs.cache
+C:\Users\User\Desktop\2DSG\obj\Debug\2DSG.exe
+C:\Users\User\Desktop\2DSG\obj\Debug\2DSG.pdb
+C:\Users\User\Desktop\2DSG\obj\Debug\_2DSG.MenuForm.resources
+C:\Users\User\Desktop\2DSG\obj\Debug\_2DSG.SettingsForm.resources
