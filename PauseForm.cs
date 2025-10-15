@@ -19,6 +19,7 @@ namespace _2DSG
         public PauseForm(GameSettings settings, Form parent, string reason)
         {
             InitializeComponent();
+            
             this.gameSettings = settings;
             this.parentGameForm = parent;
             this.reasonLabel = new Label();
@@ -26,8 +27,13 @@ namespace _2DSG
             if (reason == "Game Paused")
             {
                 ResumeBTN.Visible = true;
+                this.Text = "2D Shooting Game - Paused";
             }
-            PauseReasonLBL.MaximumSize = new Size(this.ClientSize.Width - 40, 0); 
+            else
+            {
+                this.Text = "2D Shooting Game - Game Over";
+            }
+                PauseReasonLBL.MaximumSize = new Size(this.ClientSize.Width - 40, 0); 
             PauseReasonLBL.AutoSize = true;
             PauseReasonLBL.TextAlign = ContentAlignment.MiddleCenter;
         }

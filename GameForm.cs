@@ -23,7 +23,7 @@ namespace _2DSG
         public GameForm(GameSettings gameSettings)
         {
             InitializeComponent();
-            this.Name = "2D Shooter Game";
+            this.Text = $"2D Shooter Game - {gameSettings.PlayerName1} vs {gameSettings.PlayerName2}";
             this.ClientSize = new Size(1280, 720);
 
             this.gameSettings = gameSettings;

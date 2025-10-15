@@ -15,7 +15,7 @@ namespace _2DSG
         public MenuForm()
         {
             InitializeComponent();
-            this.Name = "2D Shooting Game";
+            this.Text = "2D Shooting Game - Main Menu";
         }
 
         private void exitGameBTN_Click(object sender, EventArgs e)
