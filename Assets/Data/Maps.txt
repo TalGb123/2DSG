@@ -65,10 +65,3 @@ Chaos Assets/MapBG/Chaos.png
 ? 0.1 0.7
 ? 0.9 0.7
 
-Crossfire Assets/MapBG/Crossfire.png
-! 0.0 0.9 1.0 0.05       
-! 0.15 0.65 0.2 0.03       
-! 0.65 0.65 0.2 0.03       
-! 0.4 0.45 0.2 0.03        
-? 0.2 0.7
-? 0.8 0.7
